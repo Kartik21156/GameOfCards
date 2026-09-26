@@ -1,0 +1,120 @@
+@import 'tailwindcss';
+
+@theme {
+  --font-display: 'Fraunces', Georgia, serif;
+  --font-sans: 'Manrope', system-ui, sans-serif;
+
+  --color-felt-950: #06170f;
+  --color-felt-900: #0b2a1f;
+  --color-felt-800: #0f3a2b;
+  --color-felt-700: #145238;
+  --color-felt-600: #1b6b49;
+  --color-felt-500: #24875c;
+  --color-gold-300: #f3d99b;
+  --color-gold-400: #e8c170;
+  --color-gold-500: #c99f4c;
+  --color-gold-600: #9c7835;
+  --color-cream: #f5efe0;
+  --color-ember: #e2644f;
+  --color-sky: #6fb6e8;
+}
+
+:root {
+  color-scheme: dark;
+  /* Card width scales with the viewport; heights keep the 140×190 art ratio. */
+  --card-w: clamp(44px, 7.2vw, 88px);
+  --card-w-sm: clamp(30px, 4.6vw, 54px);
+}
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  color: var(--color-cream);
+  background:
+    radial-gradient(ellipse at 50% -10%, rgb(36 135 92 / 0.28), transparent 60%),
+    radial-gradient(ellipse at 50% 120%, rgb(0 0 0 / 0.55), transparent 55%), var(--color-felt-900);
+  background-attachment: fixed;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Subtle felt grain */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.06;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  z-index: 0;
+}
+
+#root {
+  position: relative;
+  z-index: 1;
+}
+
+.felt-table {
+  background:
+    radial-gradient(ellipse at 50% 40%, var(--color-felt-600), var(--color-felt-700) 45%, var(--color-felt-800) 80%);
+  box-shadow:
+    inset 0 0 0 6px rgb(0 0 0 / 0.25),
+    inset 0 0 60px rgb(0 0 0 / 0.45),
+    0 0 0 10px #3b2414,
+    0 0 0 12px #5a3920,
+    0 20px 60px rgb(0 0 0 / 0.6);
+}
+
+.card-img {
+  width: var(--card-w);
+  aspect-ratio: 140 / 190;
+  display: block;
+  user-select: none;
+  -webkit-user-drag: none;
+  filter: drop-shadow(0 2px 3px rgb(0 0 0 / 0.35));
+}
+.card-img.sm {
+  width: var(--card-w-sm);
+}
+
+@utility btn {
+  @apply inline-flex items-center justify-center gap-2 rounded-lg px-4 py-2 text-sm font-semibold transition
+    disabled:cursor-not-allowed disabled:opacity-40 active:translate-y-px;
+}
+@utility btn-gold {
+  @apply btn bg-gold-400 text-felt-950 shadow-[0_2px_0_var(--color-gold-600)] hover:bg-gold-300;
+}
+@utility btn-ghost {
+  @apply btn bg-white/5 text-cream ring-1 ring-white/15 hover:bg-white/10;
+}
+@utility btn-danger {
+  @apply btn bg-ember/90 text-white hover:bg-ember;
+}
+@utility input {
+  @apply w-full rounded-lg bg-felt-950/60 px-3 py-2 text-cream ring-1 ring-white/15 outline-none placeholder:text-cream/35
+    focus:ring-2 focus:ring-gold-400;
+}
+@utility panel {
+  @apply rounded-2xl bg-felt-950/55 ring-1 ring-white/10 backdrop-blur-sm;
+}
+@utility label {
+  @apply text-xs font-semibold tracking-wider text-cream/55 uppercase;
+}
+
+@keyframes pulse-ring {
+  0%,
+  100% {
+    box-shadow: 0 0 0 2px var(--color-gold-400), 0 0 12px 2px rgb(232 193 112 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 2px var(--color-gold-300), 0 0 22px 6px rgb(232 193 112 / 0.7);
+  }
+}
+.turn-ring {
+  animation: pulse-ring 1.4s ease-in-out infinite;
+}

@@ -1,0 +1,84 @@
+// SQLite for now. To move to Postgres, change the provider, swap the driver
+// adapter in src/db.ts, and run `npm run db:setup` again.
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id           String   @id @default(cuid())
+  username     String
+  /// Lower-cased username, for case-insensitive uniqueness and lookup.
+  usernameKey  String   @unique
+  email        String   @unique
+  passwordHash String
+  displayName  String
+  avatar       String   @default("pieceBlue_single00")
+  cardBack     String   @default("cardBack_blue2")
+  chips        Int      @default(5000)
+  lastTopUp    DateTime?
+  createdAt    DateTime @default(now())
+
+  stats        UserStats[]
+  games        GameParticipant[]
+  transactions ChipTransaction[]
+}
+
+model GameRecord {
+  id           String   @id @default(cuid())
+  gameId       String
+  roomName     String
+  config       String
+  summary      String
+  startedAt    DateTime
+  endedAt      DateTime @default(now())
+  participants GameParticipant[]
+
+  @@index([gameId, endedAt])
+}
+
+model GameParticipant {
+  id        String     @id @default(cuid())
+  recordId  String
+  record    GameRecord @relation(fields: [recordId], references: [id], onDelete: Cascade)
+  /// Null for bots.
+  userId    String?
+  user      User?      @relation(fields: [userId], references: [id])
+  name      String
+  seat      Int
+  placement Int
+  score     Float
+  chipDelta Int
+
+  @@index([userId])
+}
+
+model UserStats {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  gameId   String
+  played   Int    @default(0)
+  won      Int    @default(0)
+  netChips Int    @default(0)
+
+  @@unique([userId, gameId])
+  @@index([gameId, won])
+}
+
+model ChipTransaction {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  amount    Int
+  reason    String
+  balance   Int
+  createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
+}

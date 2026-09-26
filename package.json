@@ -1,0 +1,24 @@
+{
+  "name": "gameofcards",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run assets && concurrently -k -n server,client -c blue,magenta \"npm run dev -w @goc/server\" \"npm run dev -w @goc/client\"",
+    "build": "npm run assets && npm run build -w @goc/client",
+    "start": "npm run start -w @goc/server",
+    "assets": "node scripts/copy-assets.mjs",
+    "db:setup": "npm run db:push -w @goc/server",
+    "test": "vitest run",
+    "typecheck": "tsc -p packages/engine && tsc -p packages/shared && tsc -p packages/server && tsc -p packages/client"
+  },
+  "devDependencies": {
+    "@types/node": "^26.6.3",
+    "concurrently": "^10.0.5",
+    "typescript": "^7.0.2",
+    "vitest": "^5.0.2"
+  }
+}
