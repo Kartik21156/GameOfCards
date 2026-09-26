@@ -1,5 +1,4 @@
-// SQLite for now. To move to Postgres, change the provider, swap the driver
-// adapter in src/db.ts, and run `npm run db:setup` again.
+// PostgreSQL. The connection string comes from DATABASE_URL (see .env.example).
 
 generator client {
   provider = "prisma-client"
@@ -7,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
 }
 
 model User {

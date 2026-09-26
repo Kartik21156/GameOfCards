@@ -6,29 +6,34 @@ import { Server } from 'socket.io';
 import type { ClientToServer, ServerToClient } from '@goc/shared';
 import { userIdFromCookieHeader } from './auth.ts';
 import { CLIENT_DIST, HOST, PORT } from './config.ts';
-import { RoomManager } from './rooms/RoomManager.ts';
+import { db } from './db.ts';
+import { RoomManager, type SocketData } from './rooms/RoomManager.ts';
 import { registerRoutes } from './routes.ts';
 
 const app = Fastify({ logger: { level: 'warn' } });
 await app.register(fastifyCookie);
 
-const io = new Server<ClientToServer, ServerToClient, object, { userId: string }>(app.server, {
+const io = new Server<ClientToServer, ServerToClient, object, SocketData>(app.server, {
   // Same-origin in production; in dev Vite proxies /socket.io.
   cors: { origin: true, credentials: true },
 });
-io.use((socket, next) => {
+io.use(async (socket, next) => {
   const userId = userIdFromCookieHeader(socket.handshake.headers.cookie);
-  if (!userId) return next(new Error('unauthorized'));
-  socket.data.userId = userId;
+  const user = userId ? await db.user.findUnique({ where: { id: userId } }).catch(() => null) : null;
+  if (!user) return next(new Error('unauthorized'));
+  socket.data.userId = user.id;
+  socket.data.user = user;
   next();
 });
 
 const rooms = new RoomManager(io);
 io.on('connection', (socket) => {
-  rooms.connect(socket).catch((err) => {
+  try {
+    rooms.connect(socket);
+  } catch (err) {
     console.error(err);
     socket.disconnect(true);
-  });
+  }
 });
 
 registerRoutes(app, rooms);

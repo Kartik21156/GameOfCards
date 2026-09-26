@@ -11,7 +11,8 @@
     "build": "npm run assets && npm run build -w @goc/client",
     "start": "npm run start -w @goc/server",
     "assets": "node scripts/copy-assets.mjs",
-    "db:setup": "npm run db:push -w @goc/server",
+    "db:setup": "npm run db:setup -w @goc/server",
+    "db:migrate": "npm run db:migrate -w @goc/server",
     "test": "vitest run",
     "typecheck": "tsc -p packages/engine && tsc -p packages/shared && tsc -p packages/server && tsc -p packages/client"
   },

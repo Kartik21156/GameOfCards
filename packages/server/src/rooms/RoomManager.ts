@@ -16,8 +16,13 @@ import { InsufficientChips, adjustChips } from '../chips.ts';
 import { type User, db } from '../db.ts';
 import { GameRunner } from './GameRunner.ts';
 
-type IO = Server<ClientToServer, ServerToClient, object, { userId: string }>;
-type Sock = Socket<ClientToServer, ServerToClient, object, { userId: string }>;
+export interface SocketData {
+  userId: string;
+  /** Loaded by the auth middleware before the connection is accepted. */
+  user: User;
+}
+type IO = Server<ClientToServer, ServerToClient, object, SocketData>;
+type Sock = Socket<ClientToServer, ServerToClient, object, SocketData>;
 
 interface Member {
   userId: string;
@@ -73,9 +78,9 @@ export class RoomManager {
 
   // ---------- connection lifecycle ----------
 
-  async connect(socket: Sock) {
-    const user = await db.user.findUnique({ where: { id: socket.data.userId } });
-    if (!user) return socket.disconnect(true);
+  /** Synchronous on purpose: handlers must be registered before the client's first emit arrives. */
+  connect(socket: Sock) {
+    const { user } = socket.data;
     const uid = user.id;
     this.members.set(uid, { userId: uid, name: user.displayName, avatar: user.avatar });
     this.connections.set(uid, (this.connections.get(uid) ?? 0) + 1);

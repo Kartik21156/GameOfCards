@@ -2,13 +2,14 @@ import { randomBytes } from 'node:crypto';
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import { dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { requireDatabaseUrl } from './env.ts';
 
 export const SERVER_DIR = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const CLIENT_DIST = join(SERVER_DIR, '..', 'client', 'dist');
 
 export const PORT = Number(process.env.PORT ?? 3001);
 export const HOST = process.env.HOST ?? '0.0.0.0';
-export const DATABASE_URL = process.env.DATABASE_URL ?? `file:${join(SERVER_DIR, 'dev.db')}`;
+export const DATABASE_URL = requireDatabaseUrl();
 export const COOKIE = 'goc_session';
 export const SESSION_DAYS = 30;
 
